@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WCLNCH Marketplace - Your Ultimate Car Hub</title>
+<style>
+  :root {
+    --color-bg: #121212;
+    --color-text: #e0e0e0;
+    --color-accent: #e03e2f;
+    --color-muted: #888888;
+    --color-card-bg: #1e1e1e;
+    --color-border: #333333;
+    --color-hover: #2a2a2a;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin:0; padding:0; background: var(--color-bg); color: var(--color-text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-accent);
+  }
+  header {
+    background: var(--color-card-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 {
+    color: var(--color-accent);
+    font-weight: 900;
+    font-size: 1.8rem;
+    margin: 0;
+    user-select:none;
+  }
+  nav a {
+    margin-left: 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    user-select:none;
+  }
+  nav a:hover {
+    color: var(--color-accent);
+  }
+  .btn-primary, button.accent {
+    background-color: var(--color-accent);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select:none;
+  }
+  .btn-primary:hover, button.accent:hover {
+    background-color: #b22a1f;
+  }
+  main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  .search-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .search-filter input[type=text], .search-filter select {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    color: var(--color-text);
+    font-size: 1rem;
+    flex: 1 1 200px;
+    outline:none;
+    transition: border-color 0.3s ease;
+  }
+  .search-filter input[type=text]:focus, .search-filter select:focus {
+    border-color: var(--color-accent);
+  }
+  .listing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    background-color: var(--color-card-bg);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(224, 62, 47, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(224, 62, 47, 0.75);
+  }
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 2px solid var(--color-accent);
+  }
+  .card-content {
+    padding: 1rem 1.2rem 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card-title {
+    font-weight: 900;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+    color: var(--color-accent);
+    user-select:none;
+  }
+  .card-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #f5f5f5;
+    margin-bottom: 0.6rem;
+  }
+  .card-details {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  .card-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  .card-buttons button {
+    flex: 1 1 48%;
+    padding: 0.5rem 0;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    user-select:none;
+  }
+  .btn-favorite {
+    background-color: transparent;
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .btn-favorite.active, .btn-favorite:hover {
+    background-color: var(--color-accent);
+    color: #121212;
+  }
+  .btn-offer {
+    background-color: var(--color-accent);
+    color: #fff;
+    border: none;
+  }
+  .btn-offer:hover {
+    background-color: #b22a1f;
+  }
+  /* Modal styling */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom:0;
+    background-color: rgba(18,18,18,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    user-select:none;
+  }
+  .modal-backdrop.active {
+    display: flex;
+  }
+  .modal {
+    background: var(--color-card-bg);
+    border-radius: 12px;
+    max-width: 480px;
+    width: 90%;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 0 25px rgba(224,62,47,0.8);
+    color: var(--color-text);
+    user-select:none;
+    position: relative;
+  }
+  .modal h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-accent);
+    font-weight: 900;
+    user-select:none;
+  }
+  .modal label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+  }
+  .modal input[type=text], .modal input[type=email], .modal input[type=tel], .modal input[type=number], .modal input[type=date], .modal select, .modal textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: #2a2a2a;
+    color: var(--color-text);
+    font-size: 1rem;
+    outline:none;
+    resize: vertical;
+    font-family: inherit;
+  }
+  .modal input[type=text]:focus, .modal input[type=email]:focus, .modal input[type=tel]:focus, .modal input[type=number]:focus, .modal input[type=date]:focus, .modal select:focus, .modal textarea:focus {
+    border-color: var(--color-accent);
+  }
+  .modal textarea {
+    min-height: 80px;
+  }
+  .modal .modal-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    font-size: 1.8rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    user-select:none;
+    border: none;
+    background: none;
+  }
+  .modal .modal-close:hover {
+    color: var(--color-accent);
+  }
+  /* Profile avatar */
+  .profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-accent);
+    margin-left: 1rem;
+    cursor: pointer;
+    user-select:none;
+  }
+  /* Header right area */
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+  /* Notifications icon */
+  .notif-bell {
+    position: relative;
+    cursor: pointer;
+    margin-left: 1.5rem;
+    font-size: 1.4rem;
+    user-select:none;
+    color: var(--color-text);
+  }
+  .notif-bell:hover {
+    color: var(--color-accent);
+  }
+  .notif-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: var(--color-accent);
+    color: #121212;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 0 6px;
+    user-select:none;
+  }
+  /* Responsive adjustments */
+  @media(max-width: 600px) {
+    .search-filter {
+      flex-direction: column;
+    }
+    nav {
+      flex-wrap: wrap;
+    }
+    nav a {
+      margin-left: 0;
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+    }
+    header {
+      flex-wrap: wrap;
+    }
+    .header-right {
+      margin-top: 0.8rem;
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>WCLNCH Marketplace</h1>
+  <nav aria-label="Primary Navigation">
+    <a href="#" id="nav-home">Home</a>
+    <a href="#" id="nav-marketplace">Marketplace</a>
+    <a href="#" id="nav-add-listing">Add Listing</a>
+    <a href="#" id="nav-profile">Profile</a>
+  </nav>
+  <div class="header-right" aria-label="User Controls">
+    <div class="notif-bell" id="notifBell" title="Notifications" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false" aria-controls="notificationsDropdown">&#128276;<span class="notif-count" id="notifCount" style="display:none;">0</span></div>
+    <img src="https://via.placeholder.com/48?text=U" alt="User Profile Avatar" id="profileAvatar" class="profile-avatar" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false" aria-controls="profileModal"/>
+  </div>
+</header>
+<main id="mainContent" tabindex="-1">
+  <!-- Search and Filter Section -->
+  <section aria-label="Search and filter listings" class="search-filter" role="search">
+    <input type="text" id="searchInput" placeholder="Search by make, model, year, or keywords" aria-label="Search listings" autocomplete="off" />
+    <select id="filterYear" aria-label="Filter by year">
+      <option value="">All Years</option>
+      <option value="2023">2023</option>
+      <option value="2022">2022</option>
+      <option value="2021">2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+      <option value="2018">2018</option>
+      <option value="2017">2017</option>
+      <option value="2016">2016</option>
+      <option value="2015">2015</option>
+      <option value="2014">2014</option>
+      <option value="2013">2013</option>
+    </select>
+    <select id="filterPrice" aria-label="Filter by price">
+      <option value="">All Prices</option>
+      <option value="0-10000">Under $10,000</option>
+      <option value="10000-20000">$10,000 - $20,000</option>
+      <option value="20000-35000">$20,000 - $35,000</option>
+      <option value="35000-50000">$35,000 - $50,000</option>
+      <option value="50000-100000">$50,000+</option>
+    </select>
+    <select id="filterMileage" aria-label="Filter by mileage">
+      <option value="">All Mileage</option>
+      <option value="0-20000">Under 20,000 miles</option>
+      <option value="20000-50000">20,000 - 50,000 miles</option>
+      <option value="50000-100000">50,000 - 100,000 miles</option>
+      <option value="100000-9999999">100,000+ miles</option>
+    </select>
+    <button id="clearFilters" class="btn-primary" aria-label="Clear filters and search">Clear Filters</button>
+  </section>
+
+  <!-- Listings Section -->
+  <section aria-label="Car listings" id="listingSection" class="listing-grid" role="list">
+    <!-- Listings will be dynamically injected here -->
+  </section>
+
+  <!-- Favorites Section -->
+  <section aria-label="Favorites" id="favoritesSection" style="display:none; margin-top:3rem;">
+    <h2>Your Favorite Listings</h2>
+    <div id="favoritesGrid" class="listing-grid"></div>
+    <button id="closeFavorites" class="btn-primary" style="margin-top:1rem;">Close Favorites</button>
+  </section>
+</main>
+
+<!-- Modals -->
+<div class="modal-backdrop" id="listingModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="listingModalTitle" aria-hidden="true" tabindex="-1">
+  <div class="modal" role="document">
+    <button class="modal-close" aria-label="Close listing details" id="closeListingModal">&times;</button>
+    <h2 id="listingModalTitle">Car Details</h2>
+    <img id="listingModalImage" src="" alt="Car image" style="width:100%; border-radius:12px; margin-bottom:1rem; max-height:250px; object-fit:cover;" />
+    <div id="listingModalContent" style="font-size:1rem; line-height:1.4; color: var(--color-text);">
+      <!-- Filled dynamically -->
+    </div>
+    <div style="margin-top:1rem; display:flex; gap:1rem;">
+      <button class="btn-primary" id="btnSendOffer" aria-haspopup="dialog">Make Offer</button>
+      <button class="btn-favorite" id="btnToggleFavorite" aria-pressed="false">Add to Favorites</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="offerModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="offerModalTitle" aria-hidden="true" tabindex="-1">
+  <div class="modal" role="document">
+    <button class="modal-close" aria-label="Close offer form" id="closeOfferModal">&times;</button>
+    <h2 id="offerModalTitle">Make an Offer</h2>
+    <form id="offerForm">
+      <label for="offerAmount">Offer Amount ($)</label>
+      <input type="number" id="offerAmount" name="offerAmount" min="100" step="100" required aria-required="true" />
+      <label for="offerMessage">Message (optional)</label>
+      <textarea id="offerMessage" name="offerMessage" placeholder="Write a message for the seller..."></textarea>
+      <button type="submit" class="btn-primary" style="width:100%; margin-top:1rem;">Send Offer</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="profileModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle" aria-hidden="true" tabindex="-1">
+  <div class="modal" role="document">
+    <button class="modal-close" aria-label="Close profile modal" id="closeProfileModal">&times;</button>
+    <h2 id="profileModalTitle">Your Profile</h2>
+    <form id="profileForm">
+      <label for="profileName">Full Name</label>
+      <input type="text" id="profileName" name="profileName" placeholder="Your full name" required aria-required="true" />
+      <label for="profileEmail">Email</label>
+      <input type="email" id="profileEmail" name="profileEmail" placeholder="Your email address" required aria-required="true" />
+      <label for="profilePhone">Phone Number</label>
+      <input type="tel" id="profilePhone" name="profilePhone" placeholder="Your phone number" required aria-required="true" />
+      <label for="profileDOB">Date of Birth</label>
+      <input type="date" id="profileDOB" name="profileDOB" required aria-required="true" />
+      <div style="margin-bottom:1rem;">
+        <input type="checkbox" id="ageConfirm" name="ageConfirm" required aria-required="true" />
+        <label for="ageConfirm">I confirm that I am 18 years or older</label>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;">Save Profile</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="notificationsDropdown" role="menu" aria-label="Notifications" aria-hidden="true" tabindex="-1" style="flex-direction: column; align-items: flex-start; padding:1rem; max-width: 360px;">
+  <button class="modal-close" aria-label="Close notifications" id="closeNotifications">&times;</button>
+  <h3 style="color: var(--color-accent); margin-bottom: 1rem; user-select:none;">Notifications</h3>
+  <div id="notificationsList" style="width: 100%; max-height: 300px; overflow-y: auto; color: var(--color-text);"></div>
+  <button id="clearNotifications" class="btn-primary" style="margin-top:1rem; width: 100%;">Clear All</button>
+</div>
+
+<script>
+(() => {
+  // Data storage keys for localStorage fallback
+  const LS_PROFILE = 'wclnch_profile';
+  const LS_FAVORITES = 'wclnch_favorites';
+  const LS_OFFERS = 'wclnch_offers';
+  const LS_NOTIFICATIONS = 'wclnch_notifications';
+
+  // State variables
+  let listings = [
+    {
+      id: 'car1',
+      make: 'Dodge',
+      model: 'Charger SRT',
+      year: 2022,
+      price: 45000,
+      mileage: 12000,
+      description: 'Powerful 6.4L V8, black with red accents, immaculate condition, fully serviced.',
+      images: ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80'],
+      seller: 'Seller A',
+      location: 'El Dorado Hills, CA',
+      contactHidden: true
+    },
+    {
+      id: 'car2',
+      make: 'Ford',
+      model: 'Mustang GT',
+      year: 2021,
+      price: 38000,
+      mileage: 18000,
+      description: 'Deep blue Mustang GT, custom rims, excellent condition.',
+      images: ['https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=800&q=80'],
+      seller: 'Seller B',
+      location: 'Sacramento, CA',
+      contactHidden: true
+    },
+    {
+      id: 'car3',
+      make: 'Tesla',
+      model: 'Model 3',
+      year: 2023,
+      price: 52000,
+      mileage: 5000,
+      description: 'Long Range Model 3, autopilot, pristine condition, white exterior.',
+      images: ['https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80'],
+      seller: 'Seller C',
+      location: 'San Francisco, CA',
+      contactHidden: true
+    },
+    {
+      id: 'car4',
+      make: 'Chevrolet',
+      model: 'Camaro ZL1',
+      year: 2020,
+      price: 47000,
+      mileage: 22000,
+      description: 'Aggressive ZL1 Camaro, custom exhaust, sound system upgrade.',
+      images: ['https://images.unsplash.com/photo-1519648023493-d82b5f8d7f9e?auto=format&fit=crop&w=800&q=80'],
+      seller: 'Seller D',
+      location: 'Los Angeles, CA',
+      contactHidden: true
+    },
+    {
+      id: 'car5',
+      make: 'BMW',
+      model: 'M4 Competition',
+      year: 2022,
+      price: 67000,
+      mileage: 9000,
+      description: 'Sleek M4 Competition, carbon fiber trim, perfect handling, black on black.',
+      images: ['https://images.unsplash.com/photo-1519397157939-5e11a375beea?auto=format&fit=crop&w=800&q=80'],
+      seller: 'Seller E',
+      location: 'New York, NY',
+      contactHidden: true
+    }
+  ];
+
+  // Utility to get and save localStorage JSON
+  const getLS = (key) => {
+    try { return JSON.parse(localStorage.getItem(key)) || null; } catch { return null; }
+  };
+  const setLS = (key, value) => {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  };
+
+  // Load profile from LS
+  let userProfile = getLS(LS_PROFILE) || null;
+  // Load favorites and offers
+  let favorites = getLS(LS_FAVORITES) || [];
+  let offers = getLS(LS_OFFERS) || [];
+  let notifications = getLS(LS_NOTIFICATIONS) || [];
+
+  // DOM references
+  const listingSection = document.getElementById('listingSection');
+  const favoritesSection = document.getElementById('favoritesSection');
+  const favoritesGrid = document.getElementById('favoritesGrid');
+  const btnCloseFavorites = document.getElementById('closeFavorites');
+  const notifBell = document.getElementById('notifBell');
+  const notifCount = document.getElementById('notifCount');
+  const notificationsDropdown = document.getElementById('notificationsDropdown');
+  const notificationsList = document.getElementById('notificationsList');
+  const clearNotificationsBtn = document.getElementById('clearNotifications');
+  const closeNotificationsBtn = document.getElementById('closeNotifications');
+
+  const profileAvatar = document.getElementById('profileAvatar');
+  const profileModalBackdrop = document.getElementById('profileModalBackdrop');
+  const profileForm = document.getElementById('profileForm');
+  const closeProfileModalBtn = document.getElementById('closeProfileModal');
+
+  const listingModalBackdrop = document.getElementById('listingModalBackdrop');
+  const listingModalImage = document.getElementById('listingModalImage');
+  const listingModalContent = document.getElementById('listingModalContent');
+  const closeListingModalBtn = document.getElementById('closeListingModal');
+  const btnSendOffer = document.getElementById('btnSendOffer');
+  const btnToggleFavorite = document.getElementById('btnToggleFavorite');
+
+  const offerModalBackdrop = document.getElementById('offerModalBackdrop');
+  const closeOfferModalBtn = document.getElementById('closeOfferModal');
+  const offerForm = document.getElementById('offerForm');
+
+  const navMarketplace = document.getElementById('nav-marketplace');
+  const navHome = document.getElementById('nav-home');
+  const navAddListing = document.getElementById('nav-add-listing');
+  const navProfile = document.getElementById('nav-profile');
+
+  const searchInput = document.getElementById('searchInput');
+  const filterYear = document.getElementById('filterYear');
+  const filterPrice = document.getElementById('filterPrice');
+  const filterMileage = document.getElementById('filterMileage');
+  const clearFiltersBtn = document.getElementById('clearFilters');
+
+  // State for currently viewed listing
+  let currentListing = null;
+
+  // Render a listing card HTML string
+  function createListingCard(listing) {
+    const isFav = favorites.includes(listing.id);
+    return `
+    <article class="card" role="listitem" tabindex="0" aria-label="${listing.year} ${listing.make} ${listing.model}, $${listing.price}">
+      <img src="${listing.images[0]}" alt="${listing.make} ${listing.model}" loading="lazy" />
+      <div class="card-content">
+        <h3 class="card-title">${listing.year} ${listing.make} ${listing.model}</h3>
+        <div class="card-price">$${listing.price.toLocaleString()}</div>
+        <div class="card-details">${listing.mileage.toLocaleString()} miles | ${listing.location}</div>
+        <div class="card-buttons">
+          <button class="btn-favorite ${isFav ? 'active' : ''}" data-id="${listing.id}" aria-pressed="${isFav}" aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">❤</button>
+          <button class="btn-offer" data-id="${listing.id}" aria-label="View details and make offer">View Details</button>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  // Render all listings filtered and searched
+  function renderListings() {
+    let filtered = listings;
+
+    // Filters
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    if (searchTerm) {
+      filtered = filtered.filter(l => (
+        l.make.toLowerCase().includes(searchTerm) ||
+        l.model.toLowerCase().includes(searchTerm) ||
+        l.year.toString().includes(searchTerm) ||
+        l.description.toLowerCase().includes(searchTerm)
+      ));
+    }
+    if (filterYear.value) {
+      filtered = filtered.filter(l => l.year.toString() === filterYear.value);
+    }
+    if (filterPrice.value) {
+      const [minP, maxP] = filterPrice.value.split('-').map(Number);
+      filtered = filtered.filter(l => l.price >= minP && l.price <= maxP);
+    }
+    if (filterMileage.value) {
+      const [minM, maxM] = filterMileage.value.split('-').map(Number);
+      filtered = filtered.filter(l => l.mileage >= minM && l.mileage <= maxM);
+    }
+
+    if (filtered.length === 0) {
+      listingSection.innerHTML = '<p style="grid-column:1/-1; text-align:center; font-style:italic; color:var(--color-muted); user-select:none;">No listings match your criteria.</p>';
+      return;
+    }
+
+    listingSection.innerHTML = filtered.map(createListingCard).join('');
+  }
+
+  // Render favorites
+  function renderFavorites() {
+    if (!favorites.length) {
+      favoritesGrid.innerHTML = '<p style="grid-column:1/-1; text-align:center; font-style:italic; color:var(--color-muted); user-select:none;">You have no favorite listings yet.</p>';
+      return;
+    }
+    const favListings = listings.filter(l => favorites.includes(l.id));
+    favoritesGrid.innerHTML = favListings.map(createListingCard).join('');
+  }
+
+  // Show listing details modal
+  function openListingModal(listingId) {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    currentListing = listing;
+    listingModalImage.src = listing.images[0];
+    listingModalImage.alt = `${listing.make} ${listing.model}`;
+    listingModalContent.innerHTML = `
+      <p><strong>Price:</strong> $${listing.price.toLocaleString()}</p>
+      <p><strong>Mileage:</strong> ${listing.mileage.toLocaleString()} miles</p>
+      <p><strong>Location:</strong> ${listing.location}</p>
+      <p><strong>Seller:</strong> ${listing.seller}</p>
+      <p style="margin-top:1rem;">${listing.description}</p>
+    `;
+    // Update favorite button state
+    const isFav = favorites.includes(listing.id);
+    btnToggleFavorite.textContent = isFav ? 'Remove from Favorites' : 'Add to Favorites';
+    btnToggleFavorite.setAttribute('aria-pressed', isFav);
+    listingModalBackdrop.classList.add('active');
+    listingModalBackdrop.setAttribute('aria-hidden', 'false');
+    listingModalBackdrop.focus();
+  }
+
+  // Close listing modal
+  function closeListingModal() {
+    listingModalBackdrop.classList.remove('active');
+    listingModalBackdrop.setAttribute('aria-hidden', 'true');
+    currentListing = null;
+  }
+
+  // Open offer modal
+  function openOfferModal() {
+    offerForm.reset();
+    offerModalBackdrop.classList.add('active');
+    offerModalBackdrop.setAttribute('aria-hidden', 'false');
+    offerModalBackdrop.focus();
+  }
+
+  // Close offer modal
+  function closeOfferModal() {
+    offerModalBackdrop.classList.remove('active');
+    offerModalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  // Open profile modal and fill form if profile exists
+  function openProfileModal() {
+    if (userProfile) {
+      profileForm.profileName.value = userProfile.name || '';
+      profileForm.profileEmail.value = userProfile.email || '';
+      profileForm.profilePhone.value = userProfile.phone || '';
+      profileForm.profileDOB.value = userProfile.dob || '';
+      profileForm.ageConfirm.checked = false;
+    } else {
+      profileForm.reset();
+    }
+    profileModalBackdrop.classList.add('active');
+    profileModalBackdrop.setAttribute('aria-hidden', 'false');
+    profileModalBackdrop.focus();
+  }
+  // Close profile modal
+  function closeProfileModal() {
+    profileModalBackdrop.classList.remove('active');
+    profileModalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  // Show notifications dropdown
+  function openNotifications() {
+    renderNotifications();
+    notificationsDropdown.classList.add('active');
+    notificationsDropdown.setAttribute('aria-hidden', 'false');
+    notifBell.setAttribute('aria-expanded', 'true');
+    notificationsDropdown.focus();
+  }
+  // Close notifications
+  function closeNotifications() {
+    notificationsDropdown.classList.remove('active');
+    notificationsDropdown.setAttribute('aria-hidden', 'true');
+    notifBell.setAttribute('aria-expanded', 'false');
+  }
+
+  // Render notifications list
+  function renderNotifications() {
+    if (!notifications.length) {
+      notificationsList.innerHTML = '<p style="color: var(--color-muted); font-style: italic; user-select:none;">No notifications.</p>';
+      notifCount.style.display = 'none';
+      return;
+    }
+    notificationsList.innerHTML = notifications.map((n, i) => `
+      <div style="border-bottom: 1px solid var(--color-border); padding: 0.5rem 0;">
+        <strong>${n.title}</strong><br/>
+        <small style="color: var(--color-muted);">${new Date(n.date).toLocaleString()}</small>
+        <p style="margin: 0.3rem 0;">${n.message}</p>
+      </div>
+    `).join('');
+    notifCount.style.display = 'inline-block';
+    notifCount.textContent = notifications.length;
+  }
+
+  // Add notification
+  function addNotification(title, message) {
+    notifications.unshift({
+      title,
+      message,
+      date: new Date().toISOString()
+    });
+    // Keep max 20 notifications
+    if (notifications.length > 20) notifications.pop();
+    setLS(LS_NOTIFICATIONS, notifications);
+    renderNotifications();
+  }
+
+  // Toggle favorite status
+  function toggleFavorite(listingId) {
+    if (!favorites.includes(listingId)) {
+      favorites.push(listingId);
+      addNotification('Added to Favorites', `You added listing ${listingId} to your favorites.`);
+    } else {
+      favorites = favorites.filter(id => id !== listingId);
+      addNotification('Removed from Favorites', `You removed listing ${listingId} from your favorites.`);
+    }
+    setLS(LS_FAVORITES, favorites);
+  }
+
+  // Validate age >=18
+  function validateAge(dobStr) {
+    if (!dobStr) return false;
+    const dob = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age >= 18;
+  }
+
+  // Event Listeners
+
+  // Navigation
+  navMarketplace.addEventListener('click', (e) => {
+    e.preventDefault();
+    favoritesSection.style.display = 'none';
+    renderListings();
+    listingSection.style.display = 'grid';
+    searchInput.focus();
+  });
+  navHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    favoritesSection.style.display = 'none';
+    listingSection.style.display = 'grid';
+    renderListings();
+    searchInput.focus();
+  });
+  navAddListing.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Add Listing feature coming soon!');
+  });
+  navProfile.addEventListener('click', (e) => {
+    e.preventDefault();
+    openProfileModal();
+  });
+
+  // Listing buttons (delegate)
+  listingSection.addEventListener('click', (e) => {
+    if (e.target.matches('.btn-offer')) {
+      const id = e.target.getAttribute('data-id');
+      openListingModal(id);
+    }
+    if (e.target.matches('.btn-favorite')) {
+      const id = e.target.getAttribute('data-id');
+      toggleFavorite(id);
+      renderListings();
+    }
+  });
+
+  // Favorites buttons (delegate)
+  favoritesGrid.addEventListener('click', (e) => {
+    if (e.target.matches('.btn-offer')) {
+      const id = e.target.getAttribute('data-id');
+      openListingModal(id);
+    }
+    if (e.target.matches('.btn-favorite')) {
+      const id = e.target.getAttribute('data-id');
+      toggleFavorite(id);
+      renderFavorites();
+    }
+  });
+  btnCloseFavorites.addEventListener('click', () => {
+    favoritesSection.style.display = 'none';
+    listingSection.style.display = 'grid';
+  });
+
+  // Listing modal buttons
+  closeListingModalBtn.addEventListener('click', closeListingModal);
+  btnSendOffer.addEventListener('click', () => {
+    closeListingModal();
+    openOfferModal();
+  });
+  btnToggleFavorite.addEventListener('click', () => {
+    if (!currentListing) return;
+    toggleFavorite(currentListing.id);
+    btnToggleFavorite.textContent = favorites.includes(currentListing.id) ? 'Remove from Favorites' : 'Add to Favorites';
+    btnToggleFavorite.setAttribute('aria-pressed', favorites.includes(currentListing.id));
+    renderListings();
+  });
+
+  // Offer modal
+  closeOfferModalBtn.addEventListener('click', closeOfferModal);
+  offerForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!userProfile) {
+      alert('Please create your profile first to send offers.');
+      closeOfferModal();
+      openProfileModal();
+      return;
+    }
+    const amount = parseFloat(offerForm.offerAmount.value);
+    if (isNaN(amount) || amount < 100) {
+      alert('Offer amount must be $100 or more.');
+      return;
+    }
+    const message = offerForm.offerMessage.value.trim();
+
+    // Save offer locally for demo
+    offers.push({
+      listingId: currentListing.id,
+      amount,
+      message,
+      date: new Date().toISOString(),
+      from: userProfile.name || 'Anonymous'
+    });
+    setLS(LS_OFFERS, offers);
+    addNotification('New Offer Sent', `You sent an offer of $${amount.toLocaleString()} for ${currentListing.make} ${currentListing.model}.`);
+    alert('Offer sent! Seller will contact you if interested.');
+    closeOfferModal();
+  });
+
+  // Profile modal
+  closeProfileModalBtn.addEventListener('click', closeProfileModal);
+  profileForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = profileForm.profileName.value.trim();
+    const email = profileForm.profileEmail.value.trim();
+    const phone = profileForm.profilePhone.value.trim();
+    const dob = profileForm.profileDOB.value;
+    const ageConfirmed = profileForm.ageConfirm.checked;
+
+    if (!name || !email || !phone || !dob || !ageConfirmed) {
+      alert('Please fill all fields and confirm you are 18 or older.');
+      return;
+    }
+    if (!validateAge(dob)) {
+      alert('You must be 18 years or older to register.');
+      return;
+    }
+    userProfile = { name, email, phone, dob };
+    setLS(LS_PROFILE, userProfile);
+    alert('Profile saved successfully.');
+    closeProfileModal();
+  });
+
+  // Notifications
+  notifBell.addEventListener('click', () => {
+    if (notificationsDropdown.classList.contains('active')) {
+      closeNotifications();
+    } else {
+      openNotifications();
+    }
+  });
+  clearNotificationsBtn.addEventListener('click', () => {
+    notifications = [];
+    setLS(LS_NOTIFICATIONS, notifications);
+    renderNotifications();
+  });
+  closeNotificationsBtn.addEventListener('click', closeNotifications);
+
+  // Keyboard accessibility for modals close on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (listingModalBackdrop.classList.contains('active')) closeListingModal();
+      if (offerModalBackdrop.classList.contains('active')) closeOfferModal();
+      if (profileModalBackdrop.classList.contains('active')) closeProfileModal();
+      if (notificationsDropdown.classList.contains('active')) closeNotifications();
+    }
+  });
+
+  // Search & filter
+  [searchInput, filterYear, filterPrice, filterMileage].forEach(input => {
+    input.addEventListener('input', renderListings);
+  });
+  clearFiltersBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    filterYear.value = '';
+    filterPrice.value = '';
+    filterMileage.value = '';
+    renderListings();
+  });
+
+  // Profile avatar click opens profile modal
+  profileAvatar.addEventListener('click', openProfileModal);
+  profileAvatar.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openProfileModal();
+    }
+  });
+
+  // Notification bell keyboard control
+  notifBell.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      notifBell.click();
+    }
+  });
+
+  // Initial render
+  renderListings();
+  renderNotifications();
+
+  // Announce marketplace loaded for screen readers
+  window.onload = () => {
+    const mainContent = document.getElementById('mainContent');
+    if(mainContent) {
+      mainContent.setAttribute('aria-live', 'polite');
+      mainContent.setAttribute('aria-busy', 'false');
+    }
+  };
+})();
+</script>
+</body>
+</html>
